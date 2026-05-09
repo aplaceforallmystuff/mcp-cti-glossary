@@ -21,6 +21,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "ingest": "tsx scripts/ingest.ts",
+    "build:db": "tsx scripts/build-db.ts",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

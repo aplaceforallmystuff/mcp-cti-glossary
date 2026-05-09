@@ -1,96 +1,48 @@
 #!/usr/bin/env node
 // Local one-shot ingest: runs all source adapters, populates the SQLite cache.
+// Thin wrapper over src/ingest/orchestrator.ts so build-db, refresh, and lazy
+// startup all share the same execution path.
 import { openDb } from "../src/db/connection.js";
-import { upsertSource, upsertTerm } from "../src/db/queries.js";
-import type { SourceAdapter } from "../src/sources/_adapter.js";
-import { mitreAttackAdapter } from "../src/sources/mitre-attack.js";
-import { ofacSdnAdapter } from "../src/sources/ofac-sdn.js";
-import { vendorAliasesAdapter } from "../src/sources/vendor-aliases.js";
-import { nistAdapter } from "../src/sources/nist.js";
-import { mispGalaxyAdapter } from "../src/sources/misp-galaxy.js";
-import { enisaGlossaryAdapter } from "../src/sources/enisa-glossary.js";
-import { enisaTaxonomyAdapter } from "../src/sources/enisa-taxonomy.js";
-import { jargonFileAdapter } from "../src/sources/jargon-file.js";
-
-const ADAPTERS: SourceAdapter[] = [
-  mitreAttackAdapter,
-  ofacSdnAdapter,
-  vendorAliasesAdapter,
-  nistAdapter,
-  mispGalaxyAdapter,
-  enisaGlossaryAdapter,
-  enisaTaxonomyAdapter,
-  jargonFileAdapter,
-];
-
-async function ingestSource(db: ReturnType<typeof openDb>, adapter: SourceAdapter): Promise<number> {
-  const start = Date.now();
-  console.error(`\n→ ${adapter.meta.key} — fetching…`);
-
-  const sourceId = upsertSource(db, {
-    sourceKey: adapter.meta.key,
-    name: adapter.meta.name,
-    homepage: adapter.meta.homepage,
-    licenseName: adapter.meta.license.name,
-    licenseUrl: adapter.meta.license.url ?? null,
-    attribution: adapter.meta.license.attribution,
-    lastRefreshedAt: new Date().toISOString(),
-    status: "ok",
-  });
-
-  let docs;
-  try {
-    docs = await adapter.fetch();
-  } catch (err) {
-    console.error(`  ✗ fetch failed: ${(err as Error).message}`);
-    upsertSource(db, {
-      sourceKey: adapter.meta.key,
-      name: adapter.meta.name,
-      homepage: adapter.meta.homepage,
-      licenseName: adapter.meta.license.name,
-      licenseUrl: adapter.meta.license.url ?? null,
-      attribution: adapter.meta.license.attribution,
-      lastRefreshedAt: new Date().toISOString(),
-      status: "error",
-    });
-    return 0;
-  }
-
-  console.error(`  fetched ${docs.length} docs, normalizing…`);
-
-  let written = 0;
-  for (const doc of docs) {
-    const terms = adapter.normalize(doc);
-    for (const term of terms) {
-      upsertTerm(db, {
-        sourceId,
-        externalId: term.externalId,
-        term: term.term,
-        definition: term.definition,
-        category: term.category,
-        aliases: term.aliases,
-        metadata: term.metadata,
-      });
-      written++;
-    }
-  }
-
-  const elapsed = ((Date.now() - start) / 1000).toFixed(1);
-  console.error(`  ✓ ${adapter.meta.key}: ${written} terms in ${elapsed}s`);
-  return written;
-}
+import { runFullIngest, ALL_ADAPTERS } from "../src/ingest/orchestrator.js";
 
 async function main(): Promise<void> {
   const db = openDb();
   console.error("Starting full ingest…");
 
-  let total = 0;
-  for (const adapter of ADAPTERS) {
-    total += await ingestSource(db, adapter);
-  }
+  const results = await runFullIngest(db, {
+    onProgress: (msg) => {
+      switch (msg.phase) {
+        case "start":
+          console.error(`\n→ ${msg.sourceKey} — fetching…`);
+          break;
+        case "fetched":
+          console.error(
+            `  fetched ${msg.docCount} docs, normalizing…`,
+          );
+          break;
+        case "done":
+          if (msg.result.status === "ok") {
+            const elapsed = (msg.result.durationMs / 1000).toFixed(1);
+            console.error(
+              `  ✓ ${msg.result.sourceKey}: ${msg.result.termCount} terms in ${elapsed}s`,
+            );
+          } else {
+            console.error(`  ✗ ${msg.result.sourceKey}: ${msg.result.error}`);
+          }
+          break;
+      }
+    },
+  });
 
-  console.error(`\n✓ Ingest complete: ${total} total terms across ${ADAPTERS.length} sources.`);
+  const total = results.reduce((sum, r) => sum + r.termCount, 0);
+  const failed = results.filter((r) => r.status === "error").length;
+  console.error(
+    `\n${failed === 0 ? "✓" : "⚠"} Ingest complete: ${total} total terms across ${ALL_ADAPTERS.length} sources` +
+      (failed > 0 ? ` (${failed} failed)` : "") +
+      ".",
+  );
   db.close();
+  if (failed > 0) process.exit(1);
 }
 
 main().catch((err) => {

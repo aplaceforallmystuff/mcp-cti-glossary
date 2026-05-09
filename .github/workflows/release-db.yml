@@ -1,0 +1,92 @@
+name: Release prebuilt DB
+
+# Triggered when a version tag is pushed (e.g. v0.1.0). Builds the glossary
+# database from every adapter, gzips it, and attaches the artifact +
+# checksum to the matching GitHub Release. The MCP server's first-run
+# bootstrap downloads this artifact instead of running every adapter live.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to attach the artifact to (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      INPUT_TAG: ${{ inputs.tag }}
+      REF_NAME: ${{ github.ref_name }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve target tag
+        id: target
+        run: |
+          if [ -n "$INPUT_TAG" ]; then
+            TARGET="$INPUT_TAG"
+          else
+            TARGET="$REF_NAME"
+          fi
+          # Validate: only allow tag-shaped strings (e.g. v0.1.0, v1.2.3-rc1).
+          if ! printf '%s' "$TARGET" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$'; then
+            echo "Refusing tag '$TARGET' — not a valid semver tag"
+            exit 1
+          fi
+          echo "tag=$TARGET" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Build glossary database
+        run: npm run build:db
+
+      - name: Verify artifacts
+        run: |
+          ls -la build/
+          test -f build/glossary.db
+          test -f build/glossary.db.gz
+          test -f build/glossary.db.gz.sha256
+          echo "DB term count:"
+          node -e "const db=require('better-sqlite3')('build/glossary.db'); console.log(db.prepare('SELECT COUNT(*) as c FROM terms').get().c)"
+
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.target.outputs.tag }}
+        run: |
+          # Create the release if it doesn't exist (no-op if it does).
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --notes "Prebuilt glossary database for mcp-cti-glossary $TAG. The MCP server's first-run bootstrap downloads this artifact automatically."
+          fi
+          # Attach (or replace) the artifact + checksum.
+          gh release upload "$TAG" \
+            build/glossary.db.gz \
+            build/glossary.db.gz.sha256 \
+            --clobber
