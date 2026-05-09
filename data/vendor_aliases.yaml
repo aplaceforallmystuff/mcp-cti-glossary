@@ -1,0 +1,200 @@
+# Hand-curated cross-vendor threat actor and tooling naming.
+# Augments MITRE ATT&CK coverage where ATT&CK either lacks aliases or hasn't yet
+# absorbed a recently-disclosed cluster. License: MIT (this package).
+#
+# Only public vendor naming is reproduced; no proprietary CTI content.
+#
+# Adapter: src/sources/vendor-aliases.ts
+# Format: array of entries, each implementing the Term shape minus source.
+
+- external_id: salt-typhoon
+  category: cti_actor
+  term: Salt Typhoon
+  aliases:
+    - GhostEmperor
+    - FamousSparrow
+    - UNC2286
+    - Earth Estries
+    - RedMike
+  definition: >
+    Chinese state-aligned threat cluster targeting US, Latin American, and global
+    telecommunications carriers, including suspected long-term access to lawful-intercept
+    infrastructure at multiple US carriers. Salt Typhoon is the Microsoft codename;
+    GhostEmperor (Kaspersky) and FamousSparrow (ESET) describe overlapping or related
+    activity. ATT&CK has Salt Typhoon as an intrusion-set entry but as of v17 carries
+    no cross-vendor aliases — this entry fills that gap.
+  metadata:
+    primary_naming_vendor: Microsoft
+    first_disclosed_publicly: "2024-09"
+    mitre_status: present_no_aliases
+    primary_targets: [telecommunications, government]
+    references:
+      - https://www.microsoft.com/en-us/security/blog/topic/threat-intelligence/
+
+- external_id: chamelgang
+  category: cti_actor
+  term: ChamelGang
+  aliases:
+    - CamoFei
+  definition: >
+    Threat cluster active since at least 2021, named by Positive Technologies and tracked
+    by Trend Micro as CamoFei. Targeted Russian and broader CIS-region energy and aviation
+    sectors initially; in 2022 publicly disclosed to have compromised the office of the
+    Brazilian presidency. Notable for ProxyShell exploitation and BeaconLoader use. Not
+    yet absorbed into MITRE ATT&CK as of v17.
+  metadata:
+    primary_naming_vendor: Positive Technologies
+    first_disclosed_publicly: "2021-09"
+    mitre_status: not_present
+    notable_operations:
+      - target: Brazilian presidency
+        year: 2022
+        source: SentinelOne
+    references:
+      - https://www.sentinelone.com/labs/
+
+- external_id: chenlun
+  category: cti_software
+  term: Chenlun
+  aliases:
+    - Chenlun phishing kit
+  definition: >
+    Long-running Chinese-operated phishing-kit infrastructure family with persistent
+    registration patterns and distinctive TLS fingerprinting. Tracked by Mandiant
+    and Recorded Future Insikt Group. Has resisted multiple takedown attempts across
+    registrars and hosting jurisdictions. Operationally entangled with Chinese-language
+    money laundering networks (CMLNs) for cash-out. Not in MITRE ATT&CK.
+  metadata:
+    primary_naming_vendor: Mandiant
+    mitre_status: not_present
+    operator_attribution: chinese_speaking
+    primary_targets: [financial_services, postal_services, ecommerce]
+
+- external_id: cmln
+  category: cti_actor
+  term: Chinese-language Money Laundering Networks
+  aliases:
+    - CMLN
+    - CMLNs
+    - Chinese-speaking laundering networks
+  definition: >
+    Loosely-affiliated set of laundering operations that have grown to platform scale
+    across Telegram, Chinese fintech rails, and the Huione Guarantee ecosystem. Now
+    operationally entangled with Latin American cartel partners for fentanyl precursor
+    payments. The term is a CTI-community designation rather than a single named group;
+    DEA, FinCEN, and Treasury OFAC have each taken sub-cluster actions. Not in MITRE
+    ATT&CK (which doesn't track laundering networks).
+  metadata:
+    designation_type: ecosystem_label
+    mitre_status: not_present
+    relevant_us_agencies: [DEA, FinCEN, OFAC]
+    references:
+      - https://home.treasury.gov/news/press-releases
+
+- external_id: huione-guarantee
+  category: cti_actor
+  term: Huione Guarantee
+  aliases:
+    - Huione Group
+    - Huione Pay
+    - 滙旺
+    - Huiwang
+  definition: >
+    Cambodia-based escrow/marketplace ecosystem operating on Telegram and proprietary
+    apps. Identified by Elliptic in 2024 as the largest known online marketplace for
+    pig-butchering scam infrastructure and fraud-as-a-service. Treasury FinCEN
+    designated the entity as a primary money laundering concern in 2025. Financially
+    entangled with CMLN operations and regional cartel partners.
+  metadata:
+    primary_naming_vendor: Elliptic
+    first_disclosed_publicly: "2024-07"
+    mitre_status: not_present
+    treasury_action: primary_money_laundering_concern_2025
+    references:
+      - https://www.elliptic.co/blog
+      - https://home.treasury.gov/news/press-releases
+
+- external_id: nickel-disambiguation
+  category: general
+  term: NICKEL
+  aliases:
+    - NICKEL ACADEMY
+    - NICKEL GLADSTONE
+  definition: >
+    NICKEL is overloaded across security vocabularies. As a Microsoft codename it tracked
+    Ke3chang/APT15 (Chinese state-aligned actor; now renamed Nylon Typhoon under Microsoft's
+    elemental naming). NICKEL ACADEMY is a Microsoft tracking name for activity within the
+    Lazarus Group cluster. NICKEL GLADSTONE is a Microsoft tracking name for activity within
+    APT38 (DPRK-aligned). NICKEL is also a chemical element and an OFAC entity name in
+    unrelated programs. When you see "NICKEL" in CTI without further qualifiers, the
+    Microsoft-Ke3chang sense is most common in 2021–2023 reporting; later reporting tends
+    to use the renamed Nylon Typhoon.
+  metadata:
+    designation_type: disambiguation
+    notes: |
+      This entry is a deliberate cross-reference target for ambiguous-term resolution.
+      Each linked actor (Ke3chang, Lazarus Group, APT38) is in MITRE ATT&CK with its own
+      full record.
+
+- external_id: bri
+  category: general
+  term: Belt and Road Initiative
+  aliases:
+    - BRI
+    - One Belt One Road
+    - OBOR
+    - 一带一路
+  definition: >
+    PRC strategic infrastructure investment programme launched in 2013 covering ports,
+    rail, telecommunications, and digital infrastructure across Africa, Latin America,
+    Southeast Asia, and Central Asia. Relevant to CTI as the political-economic
+    framework under which Huawei and ZTE built telecom networks across Latin America
+    that are now PRC operational space (e.g. Salt Typhoon-adjacent persistence).
+    Not a threat actor; included for disambiguation in CTI contexts.
+  metadata:
+    designation_type: strategic_programme
+    relevant_to_cti: true
+    notable_implementations:
+      - Huawei deployments in Brazilian 4G
+      - ZTE Venezuelan Fatherland Card system
+      - COSCO operation of the Port of Chancay
+
+- external_id: cti-acronym
+  category: general
+  term: CTI
+  aliases:
+    - Cyber Threat Intelligence
+  definition: >
+    Cyber Threat Intelligence — the discipline and practice of collecting, analysing,
+    and disseminating intelligence about cyber adversaries, their tactics, techniques,
+    procedures (TTPs), infrastructure, and victims. Practised by vendor research teams,
+    government agencies, in-house security teams, and academic researchers.
+  metadata:
+    designation_type: discipline_acronym
+
+- external_id: secassist
+  category: general
+  term: secassist
+  aliases:
+    - Security Assistant
+  definition: >
+    Open-source security analyst assistant tooling that consumes natural-language queries
+    against threat intelligence corpuses, ATT&CK, and IOC feeds. Used in CTI deliverables
+    (including hack.lu CFP companion artefacts) as a query format that analysts can drop
+    into their existing workflows. Not a vendor product.
+  metadata:
+    designation_type: tooling
+
+- external_id: ioctas
+  category: general
+  term: IOCTA
+  aliases:
+    - Internet Organised Crime Threat Assessment
+  definition: >
+    Annual flagship CTI report from Europol's European Cybercrime Centre (EC3). Useful
+    EU-relevant baseline for any CTI work targeting a Luxembourg/EU audience.
+  metadata:
+    designation_type: report_series
+    publisher: Europol EC3
+    references:
+      - https://www.europol.europa.eu/iocta-report
