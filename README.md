@@ -17,9 +17,69 @@ Operational CTI work is dense with overlapping vocabularies — Salt Typhoon, Gh
 
 It was built to support a hack.lu CFP on the PRC Latin American threat landscape. It generalises to any CTI work where vocabulary lookup is a recurring tax.
 
+## Usage
+
+Once the server is wired into Claude Code (see [Configure Claude Code](#configure-claude-code) below), you don't call the tools by name — you just talk to Claude and it picks the right one. Below are realistic prompts paired with the tool each one triggers.
+
+### Disambiguating an overloaded term
+
+> *"In the Salt Typhoon write-up I'm reading, NICKEL keeps coming up. Which NICKEL is this?"*
+
+Triggers `glossary_disambiguate`. Returns ranked candidates — top hit is **Ke3chang** (which has NICKEL as a Microsoft codename alias), with **APT38** (NICKEL GLADSTONE) and **Lazarus Group** (NICKEL ACADEMY) as alternates. The vendor-aliases entry explains the disambiguation pattern. You pick the right sense based on the article context.
+
+### Cross-vendor actor resolution
+
+> *"I'm looking at a Mandiant report that mentions GhostEmperor. Is that a known cluster?"*
+
+Triggers `glossary_lookup`. Returns the **Salt Typhoon** entry with all five aliases (GhostEmperor, FamousSparrow, UNC2286, Earth Estries, RedMike) — confirms it's the same actor under different vendor names.
+
+### APT lookup with full alias map
+
+> *"Pull up everything on APT28 — I need the full vendor naming spread."*
+
+Triggers `glossary_actor`. Returns canonical name + 15 aliases (Fancy Bear, STRONTIUM, Forest Blizzard, Sednit, Sofacy, Pawn Storm, GruesomeLarch, etc.) plus the ATT&CK G0007 description.
+
+### ATT&CK technique by ID
+
+> *"What's T1566.001?"*
+
+Triggers `glossary_technique`. Returns Spearphishing Attachment with kill-chain phases, platforms, and ATT&CK URL. Faster than alt-tabbing to attack.mitre.org.
+
+### Fuzzy search across the corpus
+
+> *"Search the glossary for anything related to telecom pre-positioning."*
+
+Triggers `glossary_search`. FTS5 BM25 ranking — first hits will be Salt Typhoon, Volt Typhoon, and ATT&CK techniques (T1190, T1078) involving telecom infrastructure.
+
+### OFAC sanctions check
+
+> *"Is Huione Group on the OFAC SDN list?"*
+
+Triggers `glossary_lookup`. Returns vendor-aliases entry plus any matching SDN entries with their program codes (CYBER2, NARCO, etc.).
+
+### CFP / report fact-checking
+
+> *"My draft mentions Salt Typhoon, ChamelGang, NICKEL, Chenlun, and Huione Guarantee. For each one, pull the canonical entry and aliases so I can spot-check sourcing."*
+
+Claude makes sequential `glossary_actor` and `glossary_lookup` calls. Returns a quick audit table — useful before submitting a CFP, sending a threat report, or quoting a cluster name in a client deliverable.
+
+### Refresh after upstream update
+
+> *"OFAC updated the SDN list this morning. Refresh the glossary."*
+
+Triggers `glossary_refresh({ source: "ofac-sdn" })`. ~25 seconds. No need to rebuild or restart the server.
+
+### Health check
+
+> *"How fresh is my glossary corpus?"*
+
+Triggers `glossary_stats`. Returns total term count, per-source counts and last-refresh timestamps, plus a stale-source flag for anything older than 30 days.
+
+The compounding value: each time you encounter a new term in CTI material, you ask Claude inline. The structured response carries source attribution — so when you quote it in a CFP, threat report, or client deliverable, the citation chain stays intact.
+
 ## Tools
 
-All 7 tools return structured JSON with source attribution.
+All 7 tools return structured JSON with source attribution. The reference below is for direct tool invocation; for natural-language usage see [Usage](#usage) above.
 
 ### `glossary_disambiguate(term, context?)`
 
