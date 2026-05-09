@@ -15,8 +15,6 @@ An MCP server that aggregates authoritative cyber threat intelligence and securi
 
 Operational CTI work is dense with overlapping vocabularies — Salt Typhoon, GhostEmperor, FamousSparrow, and UNC2286 are the same threat cluster named by four different vendors. NICKEL is a Microsoft codename, an OFAC entity, a chemical element, and a Mandiant tracker. Each new term costs context and reading time. This server collapses that cost into one tool call, with attribution metadata so the answer is auditable.
 
-It was built to support a hack.lu CFP on the PRC Latin American threat landscape. It generalises to any CTI work where vocabulary lookup is a recurring tax.
-
 ## Usage
 
 Once the server is wired into Claude Code (see [Configure Claude Code](#configure-claude-code) below), you don't call the tools by name — you just talk to Claude and it picks the right one. Below are realistic prompts paired with the tool each one triggers.
@@ -57,11 +55,11 @@ Triggers `glossary_search`. FTS5 BM25 ranking — first hits will be Salt Typhoo
 
 Triggers `glossary_lookup`. Returns vendor-aliases entry plus any matching SDN entries with their program codes (CYBER2, NARCO, etc.).
 
-### CFP / report fact-checking
+### Multi-actor audit
 
-> *"My draft mentions Salt Typhoon, ChamelGang, NICKEL, Chenlun, and Huione Guarantee. For each one, pull the canonical entry and aliases so I can spot-check sourcing."*
+> *"I'm referencing several threat clusters in this report. For each name in this list, pull the canonical entry and aliases so I can spot-check sourcing."*
 
-Claude makes sequential `glossary_actor` and `glossary_lookup` calls. Returns a quick audit table — useful before submitting a CFP, sending a threat report, or quoting a cluster name in a client deliverable.
+Claude makes sequential `glossary_actor` and `glossary_lookup` calls. Returns a quick audit table — useful before sending a threat report or quoting a cluster name in any deliverable.
 
 ### Refresh after upstream update
 
@@ -75,7 +73,7 @@ Triggers `glossary_refresh({ source: "ofac-sdn" })`. ~25 seconds. No need to reb
 
 Triggers `glossary_stats`. Returns total term count, per-source counts and last-refresh timestamps, plus a stale-source flag for anything older than 30 days.
 
-The compounding value: each time you encounter a new term in CTI material, you ask Claude inline. The structured response carries source attribution — so when you quote it in a CFP, threat report, or client deliverable, the citation chain stays intact.
+The compounding value: each time you encounter a new term in CTI material, you ask Claude inline. The structured response carries source attribution — so when you quote it in a report, briefing, or any deliverable, the citation chain stays intact.
 
 ## Tools
 
@@ -305,7 +303,7 @@ The FTS5 query is built by quoting each whitespace-separated token. Single-chara
 
 MIT — see [LICENSE](./LICENSE).
 
-Source data is aggregated under the licenses listed in [LICENSES.md](./LICENSES.md). Every tool response carries attribution metadata so downstream usage stays clean (e.g. when quoting results in CFP submissions or threat reports).
+Source data is aggregated under the licenses listed in [LICENSES.md](./LICENSES.md). Every tool response carries attribution metadata so downstream usage stays clean (e.g. when quoting results in threat reports or briefings).
 
 ## Contributing
 

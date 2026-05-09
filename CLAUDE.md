@@ -4,7 +4,7 @@ Project-specific notes for Claude Code sessions in this repo.
 
 ## What this is
 
-An MCP server that aggregates cyber threat intelligence glossaries (MITRE ATT&CK, NIST, ENISA, Jargon File, OFAC SDN, vendor aliases) and exposes them via 7 tools for real-time disambiguation. Built primarily to support Jim's hack.lu 2026 CFP work but durable across all security work.
+An MCP server that aggregates cyber threat intelligence glossaries (MITRE ATT&CK, NIST, ENISA, Jargon File, OFAC SDN, vendor aliases) and exposes them via 7 tools for real-time disambiguation.
 
 ## Stack & conventions
 

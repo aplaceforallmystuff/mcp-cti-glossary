@@ -17,12 +17,12 @@
     - Earth Estries
     - RedMike
   definition: >
-    Chinese state-aligned threat cluster targeting US, Latin American, and global
-    telecommunications carriers, including suspected long-term access to lawful-intercept
-    infrastructure at multiple US carriers. Salt Typhoon is the Microsoft codename;
-    GhostEmperor (Kaspersky) and FamousSparrow (ESET) describe overlapping or related
-    activity. ATT&CK has Salt Typhoon as an intrusion-set entry but as of v17 carries
-    no cross-vendor aliases — this entry fills that gap.
+    Chinese state-aligned threat cluster targeting global telecommunications carriers,
+    including suspected long-term access to lawful-intercept infrastructure at multiple
+    US carriers. Salt Typhoon is the Microsoft codename; GhostEmperor (Kaspersky) and
+    FamousSparrow (ESET) describe overlapping or related activity. ATT&CK has Salt
+    Typhoon as an intrusion-set entry but as of v17 carries no cross-vendor aliases —
+    this entry fills that gap.
   metadata:
     primary_naming_vendor: Microsoft
     first_disclosed_publicly: "2024-09"
@@ -80,10 +80,10 @@
   definition: >
     Loosely-affiliated set of laundering operations that have grown to platform scale
     across Telegram, Chinese fintech rails, and the Huione Guarantee ecosystem. Now
-    operationally entangled with Latin American cartel partners for fentanyl precursor
-    payments. The term is a CTI-community designation rather than a single named group;
-    DEA, FinCEN, and Treasury OFAC have each taken sub-cluster actions. Not in MITRE
-    ATT&CK (which doesn't track laundering networks).
+    operationally entangled with cartel partners for fentanyl precursor payments. The
+    term is a CTI-community designation rather than a single named group; DEA, FinCEN,
+    and Treasury OFAC have each taken sub-cluster actions. Not in MITRE ATT&CK (which
+    doesn't track laundering networks).
   metadata:
     designation_type: ecosystem_label
     mitre_status: not_present
@@ -179,9 +179,9 @@
     - Security Assistant
   definition: >
     Open-source security analyst assistant tooling that consumes natural-language queries
-    against threat intelligence corpuses, ATT&CK, and IOC feeds. Used in CTI deliverables
-    (including hack.lu CFP companion artefacts) as a query format that analysts can drop
-    into their existing workflows. Not a vendor product.
+    against threat intelligence corpuses, ATT&CK, and IOC feeds. Used as a query format
+    that analysts can drop into their existing workflows alongside their normal tooling.
+    Not a vendor product.
   metadata:
     designation_type: tooling
 
@@ -192,7 +192,7 @@
     - Internet Organised Crime Threat Assessment
   definition: >
     Annual flagship CTI report from Europol's European Cybercrime Centre (EC3). Useful
-    EU-relevant baseline for any CTI work targeting a Luxembourg/EU audience.
+    EU-relevant baseline for any CTI work with a European audience.
   metadata:
     designation_type: report_series
     publisher: Europol EC3
