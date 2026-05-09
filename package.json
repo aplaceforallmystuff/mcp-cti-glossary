@@ -1,0 +1,67 @@
+{
+  "name": "mcp-cti-glossary-server",
+  "version": "0.1.0",
+  "mcpName": "io.github.aplaceforallmystuff/mcp-cti-glossary",
+  "description": "MCP server for CTI and cyber jargon disambiguation — MITRE ATT&CK, NIST, ENISA, OFAC, Jargon File, with full-text search across sources",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "bin": {
+    "mcp-cti-glossary": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "data",
+    "LICENSES.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "claude",
+    "claude-code",
+    "claude-desktop",
+    "ai",
+    "cyber-threat-intelligence",
+    "cti",
+    "cybersecurity",
+    "security",
+    "glossary",
+    "jargon",
+    "disambiguation",
+    "mitre-attack",
+    "nist",
+    "enisa",
+    "ofac",
+    "jargon-file"
+  ],
+  "author": "Jim Christian",
+  "homepage": "https://github.com/aplaceforallmystuff/mcp-cti-glossary#readme",
+  "bugs": {
+    "url": "https://github.com/aplaceforallmystuff/mcp-cti-glossary/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aplaceforallmystuff/mcp-cti-glossary.git"
+  }
+}
