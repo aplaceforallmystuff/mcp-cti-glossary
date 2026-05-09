@@ -11,6 +11,7 @@ import { nistAdapter } from "../sources/nist.js";
 import { mispGalaxyAdapter } from "../sources/misp-galaxy.js";
 import { enisaGlossaryAdapter } from "../sources/enisa-glossary.js";
 import { enisaTaxonomyAdapter } from "../sources/enisa-taxonomy.js";
+import { jargonFileAdapter } from "../sources/jargon-file.js";
 import { textResult, errorResult, type ToolHandler } from "./_types.js";
 
 const ADAPTERS_BY_KEY: Record<string, SourceAdapter> = {
@@ -21,6 +22,7 @@ const ADAPTERS_BY_KEY: Record<string, SourceAdapter> = {
   "misp-galaxy": mispGalaxyAdapter,
   "enisa-glossary": enisaGlossaryAdapter,
   "enisa-taxonomy": enisaTaxonomyAdapter,
+  "jargon-file": jargonFileAdapter,
 };
 
 export const inputSchema = z.object({
@@ -28,7 +30,7 @@ export const inputSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Source key to refresh (mitre-attack | ofac-sdn | vendor-aliases | nist | misp-galaxy | enisa-glossary | enisa-taxonomy). Omit to refresh all.",
+      "Source key to refresh (mitre-attack | ofac-sdn | vendor-aliases | nist | misp-galaxy | enisa-glossary | enisa-taxonomy | jargon-file). Omit to refresh all.",
     ),
 });
 type Input = z.infer<typeof inputSchema>;

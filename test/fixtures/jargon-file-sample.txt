@@ -1,0 +1,49 @@
+The Project Gutenberg eBook of The Jargon File (test fixture)
+
+Title: The Jargon File (fixture)
+
+
+*** START OF THE PROJECT GUTENBERG EBOOK THE JARGON FILE ***
+
+
+Node:Top, Next:Introduction, Previous:(dir), Up:(dir)
+
+This is fixture preamble that should be ignored.
+
+
+Node:= G =, Next:= H =, Up:The Jargon Lexicon
+
+Section heading — should be skipped.
+
+
+Node:green machine, Next:Green's Theorem, Previous:green lightning,
+Up:= G =
+
+green machine n.
+
+A computer or peripheral device that has been designed and
+built to military specifications for field equipment (that is, to
+withstand mechanical shock, extremes of temperature and humidity,
+and so forth). Comes from the olive-drab `uniform' paint used for
+military equipment.
+
+
+Node:grep, Next:gribble, Previous:greenbar, Up:=
+G =
+
+grep /grep/ vi.
+
+[from the qed/ed editor idiom g/_re_/p, where _re_
+stands for a regular expression] To rapidly scan a file or set
+of files looking for a particular string or pattern.
+
+
+Node:foo, Next:foobar, Previous:fontology, Up:= F =
+
+foo /foo/ excl.,n.,v.
+
+[very common] 1. interj. Term of disgust. 2. Used very generally
+as a sample name for absolutely anything, esp. programs and files.
+
+
+*** END OF THE PROJECT GUTENBERG EBOOK THE JARGON FILE ***

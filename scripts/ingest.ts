@@ -10,6 +10,7 @@ import { nistAdapter } from "../src/sources/nist.js";
 import { mispGalaxyAdapter } from "../src/sources/misp-galaxy.js";
 import { enisaGlossaryAdapter } from "../src/sources/enisa-glossary.js";
 import { enisaTaxonomyAdapter } from "../src/sources/enisa-taxonomy.js";
+import { jargonFileAdapter } from "../src/sources/jargon-file.js";
 
 const ADAPTERS: SourceAdapter[] = [
   mitreAttackAdapter,
@@ -19,6 +20,7 @@ const ADAPTERS: SourceAdapter[] = [
   mispGalaxyAdapter,
   enisaGlossaryAdapter,
   enisaTaxonomyAdapter,
+  jargonFileAdapter,
 ];
 
 async function ingestSource(db: ReturnType<typeof openDb>, adapter: SourceAdapter): Promise<number> {
