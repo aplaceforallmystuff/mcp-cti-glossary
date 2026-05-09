@@ -11,3 +11,6 @@ dist/
 *.db-shm
 .vitest-cache/
 coverage/
+
+# Local-only Claude Code session notes (don't ship)
+CLAUDE.md
