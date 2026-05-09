@@ -24,14 +24,25 @@ npx tsx scripts/smoke-tools.ts    # exercises each tool against real data
 | Command | What it does |
 |---|---|
 | `npm run watch` | `tsc --watch` — incremental TypeScript builds |
-| `npm test` | `vitest run` — full test suite (currently 31 tests) |
+| `npm test` | `vitest run` — full test suite (currently 120 tests across 21 files) |
 | `npm run test:watch` | vitest in watch mode |
 | `npm run typecheck` | `tsc --noEmit` — type check only, no output |
 | `npm run ingest` | Run all adapters and populate the local SQLite DB |
 
 ## Adding a New Source Adapter
 
-The `SourceAdapter` interface in `src/sources/_adapter.ts` is the contract. Existing adapters (`mitre-attack.ts`, `ofac-sdn.ts`, `vendor-aliases.ts`) are reference implementations of three different shapes (STIX JSON, XML feed, hand-curated YAML).
+The `SourceAdapter` interface in `src/sources/_adapter.ts` is the contract. Eight existing adapters cover every common shape:
+
+| Adapter | Shape | Notes |
+|---|---|---|
+| `mitre-attack.ts` | STIX 2.1 JSON | Static bundle from `mitre/cti` |
+| `ofac-sdn.ts` | XML feed | `fast-xml-parser` |
+| `nist.ts` | Zipped JSON dump | Handles abbreviation-redirect entries |
+| `misp-galaxy.ts` | Multi-cluster JSON | Pulls two cluster files in one fetch |
+| `enisa-glossary.ts` | HTML scrape | `cheerio`, snapshot-tested |
+| `enisa-taxonomy.ts` | MISP machinetag JSON | |
+| `jargon-file.ts` | Project Gutenberg plain text | `Node:` marker walker |
+| `vendor-aliases.ts` | Hand-curated YAML | `js-yaml` |
 
 To add a new source:
 
@@ -39,7 +50,7 @@ To add a new source:
 2. **Add a small fixture** at `test/fixtures/<name>-sample.<ext>`. Keep this small — do not redistribute the upstream corpus. Pick representative entries that exercise edge cases (single vs multiple aliases, missing optional fields, etc.).
 3. **Write a normalize-only test** at `test/sources/<name>.test.ts`. Exercise `normalize()` against the fixture; do NOT make network calls in tests. Validate output via `TermSchema.parse()` — every Term must be schema-valid.
 4. **Register the adapter** in:
-   - `scripts/ingest.ts` — so `npm run ingest` includes it
+   - `src/ingest/orchestrator.ts` — adds it to the canonical `ALL_ADAPTERS` list (powers `npm run ingest`, `npm run build:db`, and lazy startup)
    - `src/tools/refresh.ts` — so `glossary_refresh` can target it by source key
 5. **Add license entry** to `LICENSES.md` — every source needs a license, an attribution string, and a removal-request channel.
 6. **Verify gates pass:** `npm run build && npm run typecheck && npm test`.

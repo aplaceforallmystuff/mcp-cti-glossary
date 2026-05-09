@@ -12,7 +12,8 @@
   "files": [
     "dist",
     "data",
-    "LICENSES.md"
+    "LICENSES.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsc",

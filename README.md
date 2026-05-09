@@ -7,9 +7,9 @@
 [![MCP](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.io)
 [![Node](https://img.shields.io/badge/node-%E2%89%A518-brightgreen)](#requirements)
 
-An MCP server that aggregates authoritative cyber threat intelligence and security glossaries into a single FTS5-indexed SQLite store, exposed through 7 tools. Use it to disambiguate overloaded terms (NICKEL, CHROMIUM), resolve cross-vendor threat-actor naming (Salt Typhoon ↔ GhostEmperor ↔ FamousSparrow), look up ATT&CK techniques by ID, or scan ~20K terms with full-text search.
+An MCP server that aggregates eight authoritative cyber threat intelligence and security glossaries into a single FTS5-indexed SQLite store, exposed through 7 tools. Use it to disambiguate overloaded terms (NICKEL, CHROMIUM), resolve cross-vendor threat-actor naming (Salt Typhoon ↔ GhostEmperor ↔ FamousSparrow), look up ATT&CK techniques by ID, or scan ~34k terms with full-text search.
 
-**v1 corpus: 20,664 terms** across MITRE ATT&CK (1,707), OFAC SDN List (18,947), and a hand-curated cross-vendor alias YAML (10).
+**v0.1.0 corpus: ~34,000 terms across 8 sources** — MITRE ATT&CK, NIST CSRC Glossary, ENISA Glossary, ENISA Threat Taxonomy, MISP Galaxy (threat-actor + Microsoft activity groups), OFAC SDN, the Jargon File / New Hacker's Dictionary, and a hand-curated cross-vendor alias YAML.
 
 ## Why this exists
 
@@ -17,31 +17,31 @@ Operational CTI work is dense with overlapping vocabularies — Salt Typhoon, Gh
 
 ## Usage
 
-Once the server is wired into Claude Code (see [Configure Claude Code](#configure-claude-code) below), you don't call the tools by name — you just talk to Claude and it picks the right one. Below are realistic prompts paired with the tool each one triggers.
+Once the server is wired into Claude Code (see [Configure Claude Code](#configure-claude-code) below), you don't call the tools by name — you just talk to Claude and it picks the right one. Realistic prompts paired with the tool each one triggers:
 
 ### Disambiguating an overloaded term
 
 > *"In the Salt Typhoon write-up I'm reading, NICKEL keeps coming up. Which NICKEL is this?"*
 
-Triggers `glossary_disambiguate`. Returns ranked candidates — top hit is **Ke3chang** (which has NICKEL as a Microsoft codename alias), with **APT38** (NICKEL GLADSTONE) and **Lazarus Group** (NICKEL ACADEMY) as alternates. The vendor-aliases entry explains the disambiguation pattern. You pick the right sense based on the article context.
+Triggers `glossary_disambiguate`. Returns ranked candidates — the vendor-aliases NICKEL disambiguation entry first (which explains the Ke3chang/APT15 sense plus the NICKEL ACADEMY and NICKEL GLADSTONE Microsoft trackers), then any OFAC SDN entries with NICKEL in the name as fuzzy matches. You pick the right sense based on the article context.
 
 ### Cross-vendor actor resolution
 
 > *"I'm looking at a Mandiant report that mentions GhostEmperor. Is that a known cluster?"*
 
-Triggers `glossary_lookup`. Returns the **Salt Typhoon** entry with all five aliases (GhostEmperor, FamousSparrow, UNC2286, Earth Estries, RedMike) — confirms it's the same actor under different vendor names.
+Triggers `glossary_lookup`. Returns the **Salt Typhoon** entry from both `vendor-aliases` and `misp-galaxy` (whose Microsoft codename also points to it) with the full alias list — GhostEmperor, FamousSparrow, UNC2286, Earth Estries, RedMike. Confirms it's the same actor under different vendor names.
 
 ### APT lookup with full alias map
 
 > *"Pull up everything on APT28 — I need the full vendor naming spread."*
 
-Triggers `glossary_actor`. Returns canonical name + 15 aliases (Fancy Bear, STRONTIUM, Forest Blizzard, Sednit, Sofacy, Pawn Storm, GruesomeLarch, etc.) plus the ATT&CK G0007 description.
+Triggers `glossary_actor`. Returns the MITRE ATT&CK G0007 entry (Fancy Bear, Sofacy, Sednit, STRONTIUM…) alongside the MISP Galaxy Microsoft-codename entry (Strontium with Forest Blizzard / APT28 synonyms) — full cross-vendor coverage in one response.
 
 ### ATT&CK technique by ID
 
 > *"What's T1566.001?"*
 
-Triggers `glossary_technique`. Returns Spearphishing Attachment with kill-chain phases, platforms, and ATT&CK URL. Faster than alt-tabbing to attack.mitre.org.
+Triggers `glossary_technique`. Returns Spearphishing Attachment with kill-chain phases, platforms, and the ATT&CK URL. Faster than alt-tabbing to attack.mitre.org.
 
 ### Fuzzy search across the corpus
 
@@ -53,7 +53,7 @@ Triggers `glossary_search`. FTS5 BM25 ranking — first hits will be Salt Typhoo
 
 > *"Is Huione Group on the OFAC SDN list?"*
 
-Triggers `glossary_lookup`. Returns vendor-aliases entry plus any matching SDN entries with their program codes (CYBER2, NARCO, etc.).
+Triggers `glossary_lookup`. Returns the vendor-aliases entry plus any matching SDN entries with their program codes (CYBER2, NARCO, etc.).
 
 ### Multi-actor audit
 
@@ -65,7 +65,7 @@ Claude makes sequential `glossary_actor` and `glossary_lookup` calls. Returns a 
 
 > *"OFAC updated the SDN list this morning. Refresh the glossary."*
 
-Triggers `glossary_refresh({ source: "ofac-sdn" })`. ~25 seconds. No need to rebuild or restart the server.
+Triggers `glossary_refresh({ source: "ofac-sdn" })`. ~25 seconds. No rebuild or server restart needed.
 
 ### Health check
 
@@ -73,7 +73,7 @@ Triggers `glossary_refresh({ source: "ofac-sdn" })`. ~25 seconds. No need to reb
 
 Triggers `glossary_stats`. Returns total term count, per-source counts and last-refresh timestamps, plus a stale-source flag for anything older than 30 days.
 
-The compounding value: each time you encounter a new term in CTI material, you ask Claude inline. The structured response carries source attribution — so when you quote it in a report, briefing, or any deliverable, the citation chain stays intact.
+The compounding value: each time you encounter a new term in CTI material, you ask Claude inline. The structured response carries source attribution — when you quote it in a report, briefing, or any deliverable, the citation chain stays intact.
 
 ## Tools
 
@@ -87,84 +87,61 @@ Headline tool. Returns ranked candidates (exact matches first, then FTS5 fuzzy) 
 // Call: glossary_disambiguate({ term: "NICKEL" })
 {
   "term": "NICKEL",
-  "exactMatchCount": 2,
-  "totalCandidateCount": 5,
+  "exactMatchCount": 1,
+  "totalCandidateCount": 4,
   "candidates": [
     {
       "rank": 1,
-      "term": "Ke3chang",
-      "source": "mitre-attack",
-      "category": "cti_actor",
-      "externalId": "G0004",
-      "aliases": ["APT15", "NICKEL", "Nylon Typhoon", ...],
+      "term": "NICKEL",
+      "source": "vendor-aliases",
+      "category": "general",
+      "externalId": "nickel-disambiguation",
+      "aliases": ["NICKEL ACADEMY", "NICKEL GLADSTONE"],
       "matchKind": "exact",
-      ...
+      "definition": "NICKEL is overloaded across security vocabularies...",
+      "attribution": "Hand-curated cross-vendor naming, mcp-cti-glossary (MIT)."
     },
-    ...
+    // ... OFAC and other fuzzy matches follow
   ]
 }
 ```
 
 ### `glossary_lookup(term, source?)`
 
-Exact match by term or alias (case-insensitive), across all sources or scoped to one.
-
-```jsonc
-// Call: glossary_lookup({ term: "Salt Typhoon" })
-// Returns ATT&CK G1045 entry + the vendor-aliases entry with extra cross-vendor names.
-```
+Exact match by term or alias (case-insensitive), across all sources or scoped to one. An alias hit returns the canonical entry from every source that knows it — so `glossary_lookup({ term: "GhostEmperor" })` returns Salt Typhoon from both `vendor-aliases` and `misp-galaxy`.
 
 ### `glossary_search(query, source?, category?, limit?)`
 
-FTS5 fuzzy search across term names and definitions, BM25-ranked.
-
-```jsonc
-// Call: glossary_search({ query: "phishing kit", limit: 5 })
-```
+FTS5 fuzzy search across term names and definitions, BM25-ranked. Filter by source key (`mitre-attack`, `nist`, `enisa-glossary`, …) or category (`cti_actor`, `cti_technique`, `cultural`, `regulatory`, `general`, …).
 
 ### `glossary_actor(name_or_alias)`
 
-Threat-actor specific. Resolves any alias to the canonical entry with full alias list.
-
-```jsonc
-// Call: glossary_actor({ name_or_alias: "Fancy Bear" })
-// Returns APT28 (G0007) with 15 aliases (STRONTIUM, Forest Blizzard, Pawn Storm, ...)
-```
+Threat-actor specific. Resolves any alias to the canonical entry across every source that tracks it. Useful for cross-vendor reconciliation: ask for `APT28` and you get MITRE's intrusion-set entry plus MISP Galaxy's Microsoft `Strontium` codename in one response.
 
 ### `glossary_technique(technique_id)`
 
-ATT&CK technique by canonical ID — supports both top-level (`T1566`) and sub-techniques (`T1566.001`).
-
-```jsonc
-// Call: glossary_technique({ technique_id: "T1566" })
-// Returns Phishing technique with kill-chain phases, platforms, ATT&CK URL.
-```
+ATT&CK technique by canonical ID — supports both top-level (`T1566`) and sub-techniques (`T1566.001`). Schema-validated, so malformed IDs are rejected before the DB query.
 
 ### `glossary_refresh(source?)`
 
-Manually re-ingest one source or all. Useful when OFAC publishes a new SDN list or MITRE releases a new ATT&CK version.
-
-```jsonc
-// Call: glossary_refresh({ source: "ofac-sdn" })
-// Or: glossary_refresh({})  // refresh all sources
-```
+Manually re-ingest one source or all. Useful when OFAC publishes a new SDN list, MITRE releases a new ATT&CK version, or NIST updates the daily glossary export. Source keys: `mitre-attack`, `ofac-sdn`, `vendor-aliases`, `nist`, `misp-galaxy`, `enisa-glossary`, `enisa-taxonomy`, `jargon-file`.
 
 ### `glossary_stats(staleThresholdDays?)`
 
 Corpus health: per-source counts, last-refresh timestamps, stale-source flag.
 
-```jsonc
-// Call: glossary_stats({})
-// Returns: { totalTerms: 20664, sourceCount: 3, staleCount: 0, sources: [...] }
-```
-
 ## Sources
 
-| Source | License | Type | Size | Refresh |
+| Source | License | Type | Approx. terms | Refresh |
 |---|---|---|---|---|
-| [MITRE ATT&CK Enterprise](https://attack.mitre.org/) | Apache-2.0 | Static STIX 2.1 bundle | 1,707 terms | On-demand via `glossary_refresh` |
-| [OFAC SDN List](https://ofac.treasury.gov/) | Public Domain (US) | XML feed | 18,947 entries | On-demand; Treasury updates roughly weekly |
-| Vendor aliases (cross-walk) | MIT (this repo) | Hand-curated YAML | ~10 entries | Edit `data/vendor_aliases.yaml` and refresh |
+| [MITRE ATT&CK Enterprise](https://attack.mitre.org/) | Apache-2.0 | Static STIX 2.1 bundle | ~1,700 | On-demand via `glossary_refresh` |
+| [NIST CSRC Glossary](https://csrc.nist.gov/glossary) | Public Domain (US) | Daily JSON export (zip) | ~9,800 | Daily upstream; on-demand here |
+| [OFAC SDN List](https://ofac.treasury.gov/) | Public Domain (US) | XML feed | ~19,000 | Treasury updates ~weekly |
+| [Jargon File](http://www.catb.org/jargon/) | OPL-1.0 / Public Domain (PG ed.) | Project Gutenberg plain text | ~2,300 | On-demand |
+| [MISP Galaxy](https://github.com/MISP/misp-galaxy) | CC0-1.0 / BSD-2-Clause | threat-actor + microsoft-activity-group JSON | ~1,150 | On-demand |
+| [ENISA Glossary](https://www.enisa.europa.eu/media/media-press-kits/enisa-glossary) | CC-BY-4.0 | HTML scrape (snapshot-tested) | ~120 | On-demand |
+| [ENISA Threat Taxonomy](https://github.com/MISP/misp-taxonomies/tree/main/enisa) | CC0-1.0 / BSD-2-Clause | MISP machinetag JSON | ~170 | On-demand |
+| Vendor aliases (cross-walk) | MIT (this repo) | Hand-curated YAML | ~10 | Edit `data/vendor_aliases.yaml` and refresh |
 
 Every tool response carries license attribution metadata. See [LICENSES.md](./LICENSES.md) for full per-source attribution requirements.
 
@@ -172,7 +149,7 @@ Every tool response carries license attribution metadata. See [LICENSES.md](./LI
 
 - Node ≥ 18
 - macOS, Linux, or Windows (cache path resolves correctly via `env-paths`)
-- ~150 MB disk for the populated SQLite cache
+- ~30 MB disk for the populated SQLite cache (after VACUUM)
 
 ## Install
 
@@ -183,7 +160,12 @@ git clone https://github.com/aplaceforallmystuff/mcp-cti-glossary.git
 cd mcp-cti-glossary
 npm install
 npm run build
-npm run ingest    # ~25s — populates ~/Library/Application Support/mcp-cti-glossary/glossary.db on macOS
+```
+
+On first launch the server downloads a prebuilt ~8 MB gzipped database from the latest GitHub Release (decompresses to ~28 MB on disk). If that artifact is unreachable for any reason, the server falls back to running every adapter live (~30s). You can also pre-populate manually:
+
+```bash
+npm run ingest    # ~30s — populates ~/Library/Application Support/mcp-cti-glossary/glossary.db on macOS
 ```
 
 (npm publish is planned for v0.1.0; until then, install via clone.)
@@ -227,8 +209,9 @@ Same shape, in `~/Library/Application Support/Claude/claude_desktop_config.json`
 - `zod` + `zod-to-json-schema` for tool input validation
 - Cache path via `env-paths` (`~/Library/Application Support/mcp-cti-glossary/glossary.db` on macOS)
 - One file per tool in `src/tools/`, one per source adapter in `src/sources/`
+- `src/ingest/` holds the shared orchestrator, the prebuilt-DB fetcher, and the first-run resolver (cache → release artifact → live ingest)
 
-The `SourceAdapter` interface in `src/sources/_adapter.ts` is the contract for adding new sources. Each adapter implements `fetch(): Promise<RawDoc[]>` and `normalize(doc: RawDoc): Term[]`. Adding a new source is roughly: write the adapter, add a YAML/JSON fixture, write a normalize-only test, register in `scripts/ingest.ts` and `src/tools/refresh.ts`.
+The `SourceAdapter` interface in `src/sources/_adapter.ts` is the contract for adding new sources. Each adapter implements `fetch(): Promise<RawDoc[]>` and `normalize(doc: RawDoc): Term[]`. Adding a new source is roughly: write the adapter, add a YAML/JSON fixture, write a normalize-only test, register in `src/ingest/orchestrator.ts` and `src/tools/refresh.ts`. See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Development
 
@@ -236,9 +219,10 @@ The `SourceAdapter` interface in `src/sources/_adapter.ts` is the contract for a
 npm install
 npm run build       # tsc → dist/
 npm run watch       # tsc --watch
-npm test            # vitest run (31 unit tests across 6 files)
+npm test            # vitest run (120 tests across 21 files)
 npm run typecheck   # tsc --noEmit
-npm run ingest      # populate local SQLite cache
+npm run ingest      # populate local SQLite cache (live ingest, ~30s)
+npm run build:db    # CI artifact builder — produces build/glossary.db.gz + sha256
 ```
 
 Smoke-test the tool layer end-to-end against the populated DB:
@@ -247,29 +231,36 @@ Smoke-test the tool layer end-to-end against the populated DB:
 npx tsx scripts/smoke-tools.ts
 ```
 
+## Releases
+
+Tagging `v*.*.*` on `main` triggers `.github/workflows/release-db.yml`, which:
+
+1. Runs typecheck + the full test suite.
+2. Executes every adapter against live upstream sources.
+3. VACUUMs the resulting database, gzips it, computes `sha256`.
+4. Uploads `glossary.db.gz` + `glossary.db.gz.sha256` to the matching GitHub Release.
+
+The MCP server's first-run resolver downloads from `releases/latest/download/glossary.db.gz`, so consumers never wait on a live ingest unless GitHub itself is unreachable.
+
 ## Troubleshooting
 
 **Server boots but Claude Code reports "no tools available."**
 
 1. Confirm the path in your MCP config is absolute and points to `dist/index.js`, not `src/`.
-2. Run `node /absolute/path/to/dist/index.js < /dev/null` from a terminal — you should see `mcp-cti-glossary v0.1.0 running on stdio` on stderr within a second. If not, the build is stale: `npm run build`.
+2. Run `node /absolute/path/to/dist/index.js < /dev/null` from a terminal — within a second or two you should see `mcp-cti-glossary v0.1.0 running on stdio (db: cache|prebuilt|live-ingest)` on stderr. If not, the build is stale: `npm run build`.
 3. Check Claude Code's MCP logs for handshake errors.
 
 **Tools return "no results" for terms you know exist.**
 
-The DB may be empty. Run `npm run ingest` once before first use, or call `glossary_refresh({})` from any session to populate it. `glossary_stats({})` will tell you total term count per source.
+The DB may be empty if the prebuilt fetch failed and live ingest was skipped. Check `glossary_stats({})` for the source counts. If they're all zero, run `npm run ingest` once or call `glossary_refresh({})` from any session.
 
 **`npm run ingest` fails with "Failed to fetch MITRE ATT&CK bundle".**
 
-The static STIX bundle on `github.com/mitre/cti` is a 45MB download. Check your network and try again. The adapter's request times out at the default Node `fetch()` limit; if you're on a slow connection, run with `NODE_OPTIONS="--no-deprecation"` and let it retry.
+The static STIX bundle on `github.com/mitre/cti` is a ~50 MB download. Check your network and try again.
 
 **OFAC SDN ingest hangs.**
 
-The Treasury XML feed is ~27MB and parses to ~19K records. Expect 20-30 seconds. If it stalls beyond a minute, the feed endpoint may be down — try `curl -I https://www.treasury.gov/ofac/downloads/sdn.xml` to verify reachability.
-
-**Test failures after pulling main.**
-
-`npm install && npm run build && npm test`. The build step is required before tests because vitest imports `dist/`-style paths in some places (NodeNext module resolution).
+The Treasury XML feed is ~27 MB and parses to ~19K records. Expect 20–30 seconds. If it stalls beyond a minute, the feed endpoint may be down — try `curl -I https://www.treasury.gov/ofac/downloads/sdn.xml` to verify reachability.
 
 **FTS5 search returns no results for partial terms.**
 
@@ -277,27 +268,22 @@ The FTS5 query is built by quoting each whitespace-separated token. Single-chara
 
 ## Roadmap
 
-### v1.1 (deferred from v1 to ship faster)
+### v1.1+
 
-- **Jargon File / New Hacker's Dictionary** adapter (cultural slang corpus, ~2,500 terms)
-- **NIST Glossary** adapter (security terms — needs endpoint discovery; CSRC doesn't expose a clean CSV/JSON)
-- **ENISA Glossary** adapter (EU cyber terms — same endpoint discovery work needed)
-- **GitHub Release artifact** for prebuilt `glossary.db`, fetched on `postinstall` to bypass first-run ingest
 - **Public npm publish** as `mcp-cti-glossary-server`
-
-### v1.2+
-
-- Microsoft Threat Actor Naming taxonomy scraper (with snapshot tests for DOM churn)
-- Mandiant + CrowdStrike vendor-naming scrapers
-- Live TAXII polling instead of static STIX bundle for ATT&CK
-- Optional web-search fallback for unknown terms (env-var opt-in)
+- **SANS / HackTheBox / Spyscape glossaries**
+- **Microsoft Threat Actor Naming taxonomy scraper** (with snapshot tests for DOM churn)
+- **Mandiant + CrowdStrike vendor-naming scrapers**
+- **Live TAXII polling** instead of static STIX bundle for ATT&CK
+- **Auto-refresh cron** (until then, users call `glossary_refresh` manually)
+- **Optional web-search fallback** for unknown terms (env-var opt-in)
 
 ### Out of scope (locked)
 
 - Embedded vector search — exact-match FTS5 covers the operational need
 - Multi-language glossaries — English-only
 - Vault writeback — pure MCP server, no side effects on the user's filesystem beyond the cache DB
-- Live scraping of vendor pages — legal posture is murky; we use only public alias mappings already in MITRE
+- Live scraping of vendor pages — legal posture is murky; we use only public alias mappings already in MITRE plus the redistributable MISP Galaxy data
 
 ## License
 
@@ -307,18 +293,14 @@ Source data is aggregated under the licenses listed in [LICENSES.md](./LICENSES.
 
 ## Contributing
 
-Bugs, PRs, and new source adapters welcome. The `SourceAdapter` interface in `src/sources/_adapter.ts` documents the contract; existing adapters (`mitre-attack.ts`, `ofac-sdn.ts`, `vendor-aliases.ts`) are the reference implementations.
-
-If you're adding a new source, please include:
-
-1. The adapter (`src/sources/<name>.ts`)
-2. A small fixture (`test/fixtures/<name>-sample.<ext>`) — keep this small, do not redistribute the upstream corpus
-3. A `normalize()` test (`test/sources/<name>.test.ts`) that validates output via `TermSchema`
-4. Registration in `scripts/ingest.ts` and `src/tools/refresh.ts`
-5. License entry in `LICENSES.md`
+Bugs, PRs, and new source adapters welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md). The `SourceAdapter` interface in `src/sources/_adapter.ts` documents the contract; the eight existing adapters are reference implementations of every common shape (STIX JSON, XML feed, gzipped JSON dump, HTML scrape, MISP machinetag JSON, plain-text Project Gutenberg edition, and hand-curated YAML).
 
 ## Acknowledgements
 
 - **MITRE Corporation** — for ATT&CK, the canonical operational CTI taxonomy
+- **NIST CSRC** — for the daily-updated public-domain glossary export
+- **ENISA (European Union Agency for Cybersecurity)** — for the open glossary and threat taxonomy
+- **MISP Project / CIRCL** — for the redistributable galaxy + taxonomy ecosystem that makes cross-vendor naming tractable
 - **US Department of the Treasury / OFAC** — for the SDN list as a public-domain feed
+- **Eric S. Raymond** and the broader Jargon File contributor lineage — for the cultural slang corpus
 - The cross-vendor naming community (Microsoft Threat Intelligence, Mandiant, CrowdStrike, Recorded Future, ESET, Kaspersky, SentinelOne et al.) for the cluster aliases that make threat-actor disambiguation possible
