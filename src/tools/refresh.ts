@@ -7,19 +7,29 @@ import type { SourceAdapter } from "../sources/_adapter.js";
 import { mitreAttackAdapter } from "../sources/mitre-attack.js";
 import { ofacSdnAdapter } from "../sources/ofac-sdn.js";
 import { vendorAliasesAdapter } from "../sources/vendor-aliases.js";
+import { nistAdapter } from "../sources/nist.js";
+import { mispGalaxyAdapter } from "../sources/misp-galaxy.js";
+import { enisaGlossaryAdapter } from "../sources/enisa-glossary.js";
+import { enisaTaxonomyAdapter } from "../sources/enisa-taxonomy.js";
 import { textResult, errorResult, type ToolHandler } from "./_types.js";
 
 const ADAPTERS_BY_KEY: Record<string, SourceAdapter> = {
   "mitre-attack": mitreAttackAdapter,
   "ofac-sdn": ofacSdnAdapter,
   "vendor-aliases": vendorAliasesAdapter,
+  "nist": nistAdapter,
+  "misp-galaxy": mispGalaxyAdapter,
+  "enisa-glossary": enisaGlossaryAdapter,
+  "enisa-taxonomy": enisaTaxonomyAdapter,
 };
 
 export const inputSchema = z.object({
   source: z
     .string()
     .optional()
-    .describe("Source key to refresh (mitre-attack | ofac-sdn | vendor-aliases). Omit to refresh all."),
+    .describe(
+      "Source key to refresh (mitre-attack | ofac-sdn | vendor-aliases | nist | misp-galaxy | enisa-glossary | enisa-taxonomy). Omit to refresh all.",
+    ),
 });
 type Input = z.infer<typeof inputSchema>;
 

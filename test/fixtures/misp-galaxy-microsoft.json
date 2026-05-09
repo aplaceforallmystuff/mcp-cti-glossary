@@ -1,0 +1,21 @@
+{
+  "authors": ["MISP Project"],
+  "category": "actor",
+  "description": "Test fixture for Microsoft activity-group cluster.",
+  "name": "Microsoft Activity Group",
+  "source": "Microsoft",
+  "type": "microsoft-activity-group",
+  "uuid": "74c869ce-a8ce-4ec3-820c-da77b48eb46b",
+  "version": 999,
+  "values": [
+    {
+      "uuid": "44444444-4444-4444-4444-444444444444",
+      "value": "Strontium",
+      "description": "Microsoft's pre-2023 codename for the Russian state-sponsored cluster also tracked as Fancy Bear / APT28.",
+      "meta": {
+        "country": "RU",
+        "synonyms": ["Fancy Bear", "APT28", "Sofacy", "Sednit", "Forest Blizzard"]
+      }
+    }
+  ]
+}

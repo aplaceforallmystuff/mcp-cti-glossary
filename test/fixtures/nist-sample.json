@@ -1,0 +1,58 @@
+{
+  "totalRecords": 4,
+  "comment": "Test fixture mirroring the structure of glossary-export.json.",
+  "parentTerms": [
+    {
+      "term": "(KEM) ciphertext",
+      "link": "https://csrc.nist.gov/glossary/term/kem_ciphertext",
+      "definitions": [
+        {
+          "text": "A bit string that is produced by encapsulation and used as an input to decapsulation.",
+          "sources": [
+            { "text": "FIPS 203", "link": "https://doi.org/10.6028/NIST.FIPS.203" }
+          ]
+        }
+      ]
+    },
+    {
+      "term": ".csv",
+      "link": "https://csrc.nist.gov/glossary/term/_csv",
+      "abbrSyn": [
+        {
+          "text": "Comma-Separated Value",
+          "link": "https://csrc.nist.gov/glossary/term/comma_separated_value"
+        }
+      ],
+      "definitions": null
+    },
+    {
+      "term": "phishing",
+      "link": "https://csrc.nist.gov/glossary/term/phishing",
+      "abbrSyn": [],
+      "definitions": [
+        {
+          "text": "A technique for attempting to acquire sensitive data, such as bank account numbers, through a fraudulent solicitation in email or on a website, in which the perpetrator masquerades as a legitimate business or reputable person.",
+          "sources": [
+            { "text": "NIST SP 800-12 Rev. 1" }
+          ]
+        },
+        {
+          "text": "Tricking individuals into disclosing sensitive personal information through deceptive computer-based means.",
+          "sources": [
+            { "text": "NIST SP 800-150" }
+          ]
+        }
+      ]
+    },
+    {
+      "term": "<em>(n, e)</em>",
+      "link": "https://csrc.nist.gov/glossary/term/parenths_n_e",
+      "definitions": [
+        {
+          "text": "RSA public key.",
+          "sources": [{ "text": "NIST SP 800-56B Rev. 2" }]
+        }
+      ]
+    }
+  ]
+}

@@ -6,11 +6,19 @@ import type { SourceAdapter } from "../src/sources/_adapter.js";
 import { mitreAttackAdapter } from "../src/sources/mitre-attack.js";
 import { ofacSdnAdapter } from "../src/sources/ofac-sdn.js";
 import { vendorAliasesAdapter } from "../src/sources/vendor-aliases.js";
+import { nistAdapter } from "../src/sources/nist.js";
+import { mispGalaxyAdapter } from "../src/sources/misp-galaxy.js";
+import { enisaGlossaryAdapter } from "../src/sources/enisa-glossary.js";
+import { enisaTaxonomyAdapter } from "../src/sources/enisa-taxonomy.js";
 
 const ADAPTERS: SourceAdapter[] = [
   mitreAttackAdapter,
   ofacSdnAdapter,
   vendorAliasesAdapter,
+  nistAdapter,
+  mispGalaxyAdapter,
+  enisaGlossaryAdapter,
+  enisaTaxonomyAdapter,
 ];
 
 async function ingestSource(db: ReturnType<typeof openDb>, adapter: SourceAdapter): Promise<number> {

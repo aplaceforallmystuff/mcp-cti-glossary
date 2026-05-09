@@ -1,0 +1,51 @@
+{
+  "namespace": "enisa",
+  "description": "Test fixture for the ENISA threat taxonomy.",
+  "version": 4,
+  "expanded": "ENISA Threat Taxonomy",
+  "uuid": "00000000-0000-0000-0000-aaaaaaaaaaaa",
+  "predicates": [
+    {
+      "value": "physical-attack",
+      "expanded": "Physical attack (deliberate/intentional).",
+      "description": "Threats of intentional, hostile human actions.",
+      "uuid": "41bbf378-c2fb-5f22-b48e-714c9597d9fd"
+    },
+    {
+      "value": "nefarious-activity-abuse",
+      "expanded": "Nefarious activity / Abuse",
+      "description": "Intended actions targeting ICT systems for malicious purposes.",
+      "uuid": "00000000-0000-0000-0000-bbbbbbbbbbbb"
+    }
+  ],
+  "values": [
+    {
+      "predicate": "physical-attack",
+      "entry": [
+        {
+          "value": "fraud",
+          "expanded": "Fraud",
+          "description": "Fraud committed by humans.",
+          "uuid": "1646019b-2bc3-5f0e-bcf1-ad5ef86184d7"
+        },
+        {
+          "value": "theft",
+          "expanded": "Theft (of devices, storage media and documents)",
+          "description": "Stealing information or IT assets. Robbery.",
+          "uuid": "08cb26f9-259e-56ee-9c51-774136cc8836"
+        }
+      ]
+    },
+    {
+      "predicate": "nefarious-activity-abuse",
+      "entry": [
+        {
+          "value": "malware",
+          "expanded": "Malware",
+          "description": "Software designed to disrupt, damage, or gain unauthorized access.",
+          "uuid": "11111111-1111-1111-1111-111111111111"
+        }
+      ]
+    }
+  ]
+}

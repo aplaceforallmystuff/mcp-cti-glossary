@@ -47,6 +47,22 @@ The TypeScript server code is **MIT** (see `LICENSE`).
 - **Attribution:** Recommended:
   > OFAC Specially Designated Nationals and Blocked Persons List, US Department of the Treasury.
 
+### MISP Galaxy (threat-actor + microsoft-activity-group)
+
+- **Source:** https://github.com/MISP/misp-galaxy (clusters/threat-actor.json, clusters/microsoft-activity-group.json)
+- **License:** Dual-licensed CC0-1.0 (Public Domain Dedication) / BSD-2-Clause
+- **Attribution:** Recommended:
+  > MISP Galaxy clusters © MISP Project contributors, dual-licensed CC0-1.0 / BSD-2-Clause.
+- **Notes:** Provides cross-vendor threat-actor naming (Microsoft Typhoon/Sandstorm/Blizzard codenames, CrowdStrike Panda/Bear taxonomy, Mandiant APT tags) without scraping vendor pages. Pulled from raw GitHub at ingest time.
+
+### ENISA Threat Taxonomy (via MISP)
+
+- **Source:** https://github.com/MISP/misp-taxonomies/tree/main/enisa
+- **License:** Dual-licensed CC0-1.0 / BSD-2-Clause
+- **Attribution:** Recommended:
+  > ENISA threat taxonomy via MISP/misp-taxonomies, dual-licensed CC0-1.0 / BSD-2-Clause.
+- **Notes:** Structured threat-type classifications complementing the ENISA HTML glossary scrape.
+
 ### Vendor Aliases (`data/vendor_aliases.yaml`)
 
 - **Source:** Hand-curated from public threat-actor naming taxonomies (Microsoft, Mandiant, CrowdStrike, Recorded Future, etc.)
