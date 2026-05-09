@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdnList xmlns="https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/sdn.xml">
+  <!-- 1. Simple Entity -->
+  <sdnEntry>
+    <uid>36</uid>
+    <lastName>AEROCARIBBEAN AIRLINES</lastName>
+    <sdnType>Entity</sdnType>
+    <programList>
+      <program>CUBA</program>
+    </programList>
+    <addressList>
+      <address>
+        <uid>25</uid>
+        <city>Havana</city>
+        <country>Cuba</country>
+      </address>
+    </addressList>
+  </sdnEntry>
+
+  <!-- 2. Entity with multiple aliases and programs -->
+  <sdnEntry>
+    <uid>100</uid>
+    <lastName>GLOBAL TRADING CO.</lastName>
+    <sdnType>Entity</sdnType>
+    <programList>
+      <program>IRAN</program>
+      <program>SYRIA</program>
+    </programList>
+    <akaList>
+      <aka>
+        <uid>101</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <lastName>GTC</lastName>
+      </aka>
+      <aka>
+        <uid>102</uid>
+        <type>f.k.a.</type>
+        <category>weak</category>
+        <lastName>TRADING WORLDWIDE</lastName>
+      </aka>
+    </akaList>
+    <addressList>
+      <address>
+        <uid>103</uid>
+        <city>Dubai</city>
+        <country>United Arab Emirates</country>
+      </address>
+      <address>
+        <uid>104</uid>
+        <city>Abu Dhabi</city>
+        <country>United Arab Emirates</country>
+      </address>
+    </addressList>
+  </sdnEntry>
+
+  <!-- 3. Individual with firstName/lastName, multiple akas, programs -->
+  <sdnEntry>
+    <uid>200</uid>
+    <firstName>JOHN</firstName>
+    <lastName>DOE</lastName>
+    <sdnType>Individual</sdnType>
+    <programList>
+      <program>SDGT</program>
+      <program>RUSSIA-EO14024</program>
+    </programList>
+    <akaList>
+      <aka>
+        <uid>201</uid>
+        <type>a.k.a.</type>
+        <category>strong</category>
+        <firstName>JONNY</firstName>
+        <lastName>D.</lastName>
+      </aka>
+      <aka>
+        <uid>202</uid>
+        <type>n.k.a.</type>
+        <category>strong</category>
+        <lastName>JOHANNES</lastName>
+      </aka>
+    </akaList>
+    <addressList>
+      <address>
+        <uid>203</uid>
+        <city>Moscow</city>
+        <country>Russia</country>
+      </address>
+    </addressList>
+  </sdnEntry>
+
+  <!-- 4. Vessel with vesselInfo -->
+  <sdnEntry>
+    <uid>300</uid>
+    <lastName>OCEAN STAR</lastName>
+    <sdnType>Vessel</sdnType>
+    <programList>
+      <program>NORTH KOREA</program>
+    </programList>
+    <vesselInfo>
+      <vesselType>Cargo</vesselType>
+      <vesselFlag>Panama</vesselFlag>
+      <tonnage>5000</tonnage>
+    </vesselInfo>
+  </sdnEntry>
+
+  <!-- 5. Aircraft with minimal data -->
+  <sdnEntry>
+    <uid>400</uid>
+    <lastName>AERO-55</lastName>
+    <sdnType>Aircraft</sdnType>
+    <programList>
+      <program>VENEZUELA</program>
+    </programList>
+  </sdnEntry>
+
+  <!-- 6. Entry with remarks -->
+  <sdnEntry>
+    <uid>500</uid>
+    <lastName>REMARKS ENTITY</lastName>
+    <sdnType>Entity</sdnType>
+    <remarks>This is a test remark for the OFAC SDN list.</remarks>
+    <programList>
+      <program>NON-PROLIFERATION</program>
+    </programList>
+  </sdnEntry>
+</sdnList>
