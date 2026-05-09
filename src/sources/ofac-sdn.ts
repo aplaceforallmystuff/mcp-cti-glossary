@@ -43,11 +43,17 @@ function ensureArray<T>(val: T | T[] | undefined): T[] {
   return Array.isArray(val) ? val : [val];
 }
 
-function getDisplayName(obj: { firstName?: string; lastName: string }, sdnType: string): string {
-  if (sdnType === "Individual" && obj.firstName) {
-    return `${obj.firstName} ${obj.lastName}`.trim();
+function asStr(v: unknown): string {
+  if (v === null || v === undefined) return "";
+  return String(v);
+}
+
+function getDisplayName(obj: { firstName?: unknown; lastName: unknown }, sdnType: string): string {
+  const last = asStr(obj.lastName);
+  if (sdnType === "Individual" && obj.firstName !== undefined && obj.firstName !== null) {
+    return `${asStr(obj.firstName)} ${last}`.trim();
   }
-  return obj.lastName.trim();
+  return last.trim();
 }
 
 export const ofacSdnAdapter: SourceAdapter = {
@@ -71,7 +77,7 @@ export const ofacSdnAdapter: SourceAdapter = {
     const parser = new XMLParser({
       ignoreAttributes: false,
       removeNSPrefix: true,
-      parseTagValue: true,
+      parseTagValue: false,
       trimValues: true,
     });
     
