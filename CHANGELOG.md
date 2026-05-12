@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Breaking:** dropped Node 18 support. Minimum runtime is now Node 20. Node 18
+  reached end-of-life in April 2025, and `undici` v6+ (a transitive test-time
+  dependency) requires the global `File` constructor, which is only available
+  on Node ≥ 20. CI matrix narrowed to 20.x and 22.x.
+
 ## [0.1.0] - 2026-05-09
 
 First public release. Aggregates eight authoritative CTI / cyber glossaries

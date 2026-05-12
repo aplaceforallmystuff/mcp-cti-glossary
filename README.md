@@ -5,7 +5,7 @@
 [![CI](https://github.com/aplaceforallmystuff/mcp-cti-glossary/actions/workflows/ci.yml/badge.svg)](https://github.com/aplaceforallmystuff/mcp-cti-glossary/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-blue)](https://modelcontextprotocol.io)
-[![Node](https://img.shields.io/badge/node-%E2%89%A518-brightgreen)](#requirements)
+[![Node](https://img.shields.io/badge/node-%E2%89%A520-brightgreen)](#requirements)
 
 An MCP server that aggregates eight authoritative cyber threat intelligence and security glossaries into a single FTS5-indexed SQLite store, exposed through 7 tools. Use it to disambiguate overloaded terms (NICKEL, CHROMIUM), resolve cross-vendor threat-actor naming (Salt Typhoon ↔ GhostEmperor ↔ FamousSparrow), look up ATT&CK techniques by ID, or scan ~34k terms with full-text search.
 
@@ -147,7 +147,7 @@ Every tool response carries license attribution metadata. See [LICENSES.md](./LI
 
 ## Requirements
 
-- Node ≥ 18
+- Node ≥ 20
 - macOS, Linux, or Windows (cache path resolves correctly via `env-paths`)
 - ~30 MB disk for the populated SQLite cache (after VACUUM)
 
